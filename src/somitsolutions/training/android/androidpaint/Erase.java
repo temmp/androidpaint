@@ -11,7 +11,7 @@ private ArrayList<Path>_erasegraphicspath;
 	public Erase(){
 		super();
 		_erasegraphicspath = new ArrayList<Path>();
-		strokeWidth = 8;
+		strokeWidth = 15;
 	}
 	
 	public ArrayList<Path> getGraphicsPath(){

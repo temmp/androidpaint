@@ -1,9 +1,15 @@
 package somitsolutions.training.android.androidpaint;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import android.app.Activity;
+import android.app.WallpaperManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +19,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -56,7 +64,10 @@ public class AndroidPaint extends Activity {
 	private ArrayList<Shape> graphicobjects;
 	
 	private Bitmap wallPaperBitmap;
-	
+	String mImagePath;
+	//private String mImagePath = Environment.getExternalStorageDirectory() + "/androidpaint";
+	File file;
+	Canvas bitmapCanvas;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);       
@@ -64,6 +75,8 @@ public class AndroidPaint extends Activity {
         color = new double[3];
         
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        
+       
         
        //requestWindowFeature(Window.)
         
@@ -93,7 +106,28 @@ public class AndroidPaint extends Activity {
         colormenuclicked = false;
         
         BrushWidth = 3;
-        wallPaperBitmap = null;
+        
+        File direct = new File(Environment.getExternalStorageDirectory() + "/androidpaint");
+
+        if(!direct.exists())
+         {
+             if(direct.mkdir());//directory is created;
+
+         }
+        mImagePath = Environment.getExternalStorageDirectory() + "/androidpaint";
+        
+        WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
+        
+        Display display = getWindowManager().getDefaultDisplay();
+        
+        //wallpaperHeight = wallpaperManager.getDesiredMinimumHeight();
+        int wallpaperHeight = display.getHeight();
+        //wallpaperWidth = wallpaperManager.getDesiredMinimumWidth();
+        int wallpaperWidth = display.getWidth();
+        //path_of_shape_for_WallPaperBitmap = new Path();
+        
+        wallPaperBitmap = Bitmap.createBitmap(wallpaperWidth, wallpaperHeight, Bitmap.Config.ARGB_8888);
+        bitmapCanvas = new Canvas(wallPaperBitmap);
     }
     
     //test
@@ -137,7 +171,7 @@ public class AndroidPaint extends Activity {
     	//new line is being added
     	//p.getGraphicObjects() = new ArrayList<Shape>(); 
          //setContentView(p);
-        // wallPaperBitmap = Bitmap.createBitmap(p.getWidth(),p.getHeight(),Bitmap.Config.ARGB_8888);
+        //wallPaperBitmap = Bitmap.createBitmap(p.getWidth(),p.getHeight(),Bitmap.Config.ARGB_8888);
          
         /* //test
          if (getLastNonConfigurationInstance() != null)
@@ -279,21 +313,41 @@ public boolean onOptionsItemSelected(MenuItem item){
     	
     case R.id.itemSetWallPaper:
     	//wallPaperBitmap = Bitmap.createBitmap(p.getWidth(),p.getHeight(),Bitmap.Config.ARGB_8888);
-    	Bitmap temp = p.getDrawingCache(true);
-    	wallPaperBitmap = Bitmap.createBitmap(temp);
+    	//Bitmap temp = p.getDrawingCache(true);
+    	//wallPaperBitmap = Bitmap.createBitmap(temp);
     	//Canv
     	//Canvas canvas = p.getHolder().lockCanvas();
     	//p.getHolder().lockCanvas().drawBitmap(wallPaperBitmap, 0,0, mPaint);
     	//p.draw(canvas);
-    	try{
+/*    	try{
     		getApplicationContext().setWallpaper(wallPaperBitmap);
     	}
     	catch(IOException e){
     		e.printStackTrace();
     	}
-    	
+*/    	
     	return true;
-    }
+    
+    
+    case R.id.itemSaveImage:
+	
+		 Calendar currentDate = Calendar.getInstance();
+		  SimpleDateFormat formatter= new SimpleDateFormat("yyyyMMMddHmmss");
+		  String dateNow = formatter.format(currentDate.getTime());
+		  file = new File(mImagePath + "/" + dateNow +".9.png");
+		  FileOutputStream fos;
+		  try {
+	       fos = new FileOutputStream(file);
+	       wallPaperBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+	       fos.close();
+		  } catch (FileNotFoundException e) {
+	       Log.e("Panel", "FileNotFoundException", e);
+		  } 
+		  catch (IOException e) {
+	       Log.e("Panel", "IOEception", e);
+	   }
+	  return true;
+}
    
 	return false;
 } 
@@ -646,13 +700,18 @@ public void onActivityResult(int requestcode, int resultcode, Intent result ) {
 	        		if(currentGraphicObject instanceof FreeHand){
 	        			for (Path path : ((FreeHand)currentGraphicObject).getGraphicsPath()) {
 	                	    canvas.drawPath(path, mPaint);
+	                	    bitmapCanvas.drawPath(path,mPaint);
+	                	    currentGraphicObject = null;
 	            		}
 	        		}
 	        		
 	        		else if(currentGraphicObject instanceof Erase){
 	        			for (Path path : ((Erase)currentGraphicObject).getGraphicsPath()) {
 	                	    canvas.drawPath(path, mPaint);
-	            		}	
+	                	    bitmapCanvas.drawPath(path,mPaint);
+	                	    currentGraphicObject = null;
+	            		}
+	        			
 	        		}
 	        		
 	        		else{
