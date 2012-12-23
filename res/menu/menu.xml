@@ -20,6 +20,6 @@
 <item android:id="@+id/itemBrushWidth6" android:title="6" android:visible="true" android:enabled="true" android:checkable="false"></item>
 </menu>
 </item>
-<item android:id="@+id/itemSetWallPaper" android:title="Set As WallPaper" android:visible="true" android:enabled="true" android:checkable="false"></item>
 <item android:id="@+id/itemSaveImage" android:title="Save Image" android:visible="true" android:enabled="true" android:checkable="false"></item>
+<item android:id="@+id/itemShareImage" android:title="Share Image" android:visible="true" android:enabled="true" android:checkable="false"></item>
 </menu>

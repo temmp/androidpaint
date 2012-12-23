@@ -9,15 +9,18 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.WallpaperManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -29,6 +32,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.Window;
+import android.widget.Toast;
 
 public class AndroidPaint extends Activity {
     /** Called when the activity is first created. */
@@ -64,10 +68,10 @@ public class AndroidPaint extends Activity {
 	private ArrayList<Shape> graphicobjects;
 	
 	private Bitmap wallPaperBitmap;
-	String mImagePath;
-	//private String mImagePath = Environment.getExternalStorageDirectory() + "/androidpaint";
+	static String mImagePath;
 	File file;
 	Canvas bitmapCanvas;
+	String savedFilePath = "";
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);       
@@ -311,30 +315,34 @@ public boolean onOptionsItemSelected(MenuItem item){
     	brushwidthmenuclicked = true;
     	return true;
     	
-    case R.id.itemSetWallPaper:
-    	//wallPaperBitmap = Bitmap.createBitmap(p.getWidth(),p.getHeight(),Bitmap.Config.ARGB_8888);
-    	//Bitmap temp = p.getDrawingCache(true);
-    	//wallPaperBitmap = Bitmap.createBitmap(temp);
-    	//Canv
-    	//Canvas canvas = p.getHolder().lockCanvas();
-    	//p.getHolder().lockCanvas().drawBitmap(wallPaperBitmap, 0,0, mPaint);
-    	//p.draw(canvas);
-/*    	try{
-    		getApplicationContext().setWallpaper(wallPaperBitmap);
+    case R.id.itemShareImage:
+    	
+    	Intent share;
+    	File attachment = null;
+    	if(!savedFilePath.equals("")){
+    		attachment = new File(savedFilePath);
+			boolean isFileThere = attachment.exists();
+			if (isFileThere == true){
+				share = new Intent(Intent.ACTION_SEND);
+				share.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(attachment));
+				share.setType("image/png");
+				startActivity(Intent.createChooser(share, "Share image"));
+				//return true;
+			}
     	}
-    	catch(IOException e){
-    		e.printStackTrace();
-    	}
-*/    	
-    	return true;
-    
+		else{
+			Toast.makeText(getApplicationContext(), "Please save the image first...", Toast.LENGTH_LONG).show();
+		}
+		return true;
     
     case R.id.itemSaveImage:
 	
 		 Calendar currentDate = Calendar.getInstance();
 		  SimpleDateFormat formatter= new SimpleDateFormat("yyyyMMMddHmmss");
 		  String dateNow = formatter.format(currentDate.getTime());
-		  file = new File(mImagePath + "/" + dateNow +".9.png");
+		  savedFilePath = mImagePath + "/" + dateNow +".9.png";
+		  file = new File(savedFilePath);
 		  FileOutputStream fos;
 		  try {
 	       fos = new FileOutputStream(file);
