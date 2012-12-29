@@ -724,6 +724,7 @@ public void onActivityResult(int requestcode, int resultcode, Intent result ) {
 	        		
 	        		else{
 	        			canvas.drawPath(currentGraphicObject.getPath(),mPaint);
+	        			bitmapCanvas.drawPath(currentGraphicObject.getPath(),mPaint);
 	        		}
 	        	}
         	//}
