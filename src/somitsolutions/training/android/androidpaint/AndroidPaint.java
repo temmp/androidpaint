@@ -329,6 +329,8 @@ public boolean onOptionsItemSelected(MenuItem item){
 				share.setType("image/png");
 				startActivity(Intent.createChooser(share, "Share image"));
 				//return true;
+				//after sharing reset the savedFilePath
+				savedFilePath = "";
 			}
     	}
 		else{
