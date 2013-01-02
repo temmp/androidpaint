@@ -72,6 +72,7 @@ public class AndroidPaint extends Activity {
 	File file;
 	Canvas bitmapCanvas;
 	String savedFilePath = "";
+	private boolean isFileAlreadySaved = false;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);       
@@ -319,7 +320,8 @@ public boolean onOptionsItemSelected(MenuItem item){
     	
     	Intent share;
     	File attachment = null;
-    	if(!savedFilePath.equals("")){
+    	//if(!savedFilePath.equals("")){
+    	if(isFileAlreadySaved == true){
     		attachment = new File(savedFilePath);
 			boolean isFileThere = attachment.exists();
 			if (isFileThere == true){
@@ -327,10 +329,10 @@ public boolean onOptionsItemSelected(MenuItem item){
 				share.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(attachment));
 				share.setType("image/png");
-				startActivity(Intent.createChooser(share, "Share image"));
+				startActivity(Intent.createChooser(share, "Share drawing"));
 				//return true;
 				//after sharing reset the savedFilePath
-				savedFilePath = "";
+				//savedFilePath = "";
 			}
     	}
 		else{
@@ -339,24 +341,26 @@ public boolean onOptionsItemSelected(MenuItem item){
 		return true;
     
     case R.id.itemSaveImage:
-	
-		 Calendar currentDate = Calendar.getInstance();
-		  SimpleDateFormat formatter= new SimpleDateFormat("yyyyMMMddHmmss");
-		  String dateNow = formatter.format(currentDate.getTime());
-		  savedFilePath = mImagePath + "/" + dateNow +".9.png";
-		  file = new File(savedFilePath);
-		  FileOutputStream fos;
-		  try {
-	       fos = new FileOutputStream(file);
-	       wallPaperBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-	       fos.close();
-		  } catch (FileNotFoundException e) {
-	       Log.e("Panel", "FileNotFoundException", e);
-		  } 
-		  catch (IOException e) {
-	       Log.e("Panel", "IOEception", e);
-	   }
-	  return true;
+    	if(isFileAlreadySaved == false){
+			 Calendar currentDate = Calendar.getInstance();
+			  SimpleDateFormat formatter= new SimpleDateFormat("yyyyMMMddHmmss");
+			  String dateNow = formatter.format(currentDate.getTime());
+			  savedFilePath = mImagePath + "/" + dateNow +".9.png";
+			  file = new File(savedFilePath);
+			  FileOutputStream fos;
+			  try {
+		       fos = new FileOutputStream(file);
+		       wallPaperBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+		       fos.close();
+		       isFileAlreadySaved = true;
+			  } catch (FileNotFoundException e) {
+		       Log.e("Panel", "FileNotFoundException", e);
+			  } 
+			  catch (IOException e) {
+		       Log.e("Panel", "IOEception", e);
+		   }
+		 return true;
+    	}
 }
    
 	return false;
@@ -432,6 +436,7 @@ public void onActivityResult(int requestcode, int resultcode, Intent result ) {
         @Override
         public boolean onTouchEvent(MotionEvent event) {
         	//if(shapemenuclicked == true && erasemenuclicked == false){
+        	isFileAlreadySaved = false;
 	        	synchronized (_thread.getSurfaceHolder()) {
 	        		
 	        		if(event.getAction() == MotionEvent.ACTION_DOWN){
