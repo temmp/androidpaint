@@ -1,0 +1,1 @@
+AndroidPaint is a simple app using which one can draw different geometrical shapes as well as freehand drawing on the canvas of the device. One can save the drawing and share it with friends.
